@@ -1,0 +1,27 @@
+Steps required to render 3D in a web-browser using WASM and C++
+===============================================================
+
+Create a base machine
+=====================
+- Install Virtualbox
+- Download Fedora ISO Image V38?
+- Create a Fedora Virtual Machine using downloaded ISO (8GB RAM / 20GB HD)
+
+Make a projects directory
+=================
+cd ~
+mkdir projects
+cd projects
+
+
+Install Emscripten
+==================
+Emscripten is required to provide a C/C++ toolchain targetting WASM
+git clone https://github.com/emscripten-core/emsdk.git
+cd emsdk
+./emsdk install latest
+
+
+Install Magnum
+==============
+Magnum is required 
