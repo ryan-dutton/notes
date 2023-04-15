@@ -20,7 +20,38 @@ Emscripten is required to provide a C/C++ toolchain targetting WASM
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 ./emsdk install latest
+./emsdk activate latest
 
+
+Install Magnum bootstrap project
+=================================
+wget https://github.com/mosra/magnum-bootstrap/archive/base.zip
+unzip base.zip
+cd magnum-bootstrap-base
+
+Install Magnum and Corrade libs (under magnum-bootstrap-base)
+=================================================
+git clone https://github.com/mosra/corrade.git
+git clone https://github.com/mosra/magnum.git
+
+Edit CMakeLists.txt and include these lines:
+
+# Add Corrade as a subproject
+add_subdirectory(corrade EXCLUDE_FROM_ALL)
+
+# Add Magnum as a subproject, enable Sdl2Application
+set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+add_subdirectory(magnum EXCLUDE_FROM_ALL)
+
+Install CMake
+==========================
+sudo dnf install cmake
+
+Run a test build
+==========================
+mkdir -p build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build .
 
 Install Magnum
 ==============
