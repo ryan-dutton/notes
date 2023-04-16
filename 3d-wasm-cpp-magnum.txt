@@ -47,6 +47,14 @@ Install CMake
 ==========================
 sudo dnf install cmake
 
+Install GCC
+===========
+sudo dnf install gcc
+sudo dnf install G++
+
+sudo dnf install mesa-libGLU-devel
+sudo dnf install SDL2-devel
+
 Run a test build
 ==========================
 mkdir -p build && cd build
