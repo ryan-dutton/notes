@@ -67,15 +67,29 @@ cmake --build .
 ./Debug/bin/MyApplication
 #you should see a blank window
 
-Build for Emscripten
+Build Corrade for Emscripten
 ====================
-#first do a manual build of corrade to generate corraderc executable
+#first do a manual build of corrade to generate corrade-rc executable
 cd ../corrade
 mkdir build && cd build
-cmake ..
+cmake .. -DCORRADE_BUILD_STATIC=On
+cmake --build .
+find -name "corrade-rc"
+# should be found at ./bin/corrade-rc
+# equating to /home/ryan/magnum-bootstrap-base/corrade/bin/corrade-rc
+# now build Corrade 'for' emscripten
+cd ../ #should be in ~/magnum-bootstrap-base/corrade
+cp -R ../toolchains .
+mkdir build-emscripten && cd build-emscripten
+cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DEMSCRIPTEN_PREFIX=/home/ryan/emsdk/upstream/emscripten  -DCMAKE_BUILD_TYPE=Release -DCCORRADE_RC_EXECUTABLE=/home/ryan/magnum-bootstrap-base/corrade/build/bin/corrade-rc
 cmake --build .
 
+cd ../..
+pwd #should be /home/ryan/magnum-bootstrap-base
+mkdir build-emscripten && cd build-emscripten
+cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DCMAKE_BUILD_TYPE=Release -DCCORRADE_RC_EXECUTABLE=/home/ryan/magnum-bootstrap-base/corrade/build/bin/corrade-rc
 
 #build with emscripten
+cd ../../build-emscripten
 mkdir build-emscripten && cd build-emscripten
 
