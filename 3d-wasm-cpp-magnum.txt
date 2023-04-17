@@ -7,12 +7,6 @@ Create a base machine
 - Download Fedora ISO Image V38?
 - Create a Fedora Virtual Machine using downloaded ISO (8GB RAM / 20GB HD)
 
-Make a projects directory
-=================
-cd ~
-mkdir projects
-cd projects
-
 
 Install Emscripten
 ==================
