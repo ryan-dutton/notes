@@ -123,6 +123,7 @@ nano index.html
 cp ../../../magnum/src/Magnum/Platform/WebApplication.css .
 cp ../../../magnum/src/Magnum/Platform/EmscriptenApplication.js .
 
+python3 -m http.server
 
 
 
