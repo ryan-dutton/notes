@@ -34,7 +34,12 @@ Install Magnum and Corrade libs (under magnum-bootstrap-base)
 git clone https://github.com/mosra/corrade.git
 git clone https://github.com/mosra/magnum.git
 
-Edit CMakeLists.txt and include these lines:
+Edit CMakeLists.txt and replace contents with:
+
+cmake_minimum_required(VERSION 3.4)
+project(MyApplication)
+
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/modules/" ${CMAKE_MODULE_PATH})
 
 # Add Corrade as a subproject
 add_subdirectory(corrade EXCLUDE_FROM_ALL)
@@ -43,24 +48,34 @@ add_subdirectory(corrade EXCLUDE_FROM_ALL)
 set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
 add_subdirectory(magnum EXCLUDE_FROM_ALL)
 
-Install CMake
+add_subdirectory(src)
+
+
+
+
+Install CMake and other libs
 ==========================
-sudo dnf install cmake
+sudo dnf install cmake gcc g++ SDL2-devel
 
-Install GCC
-===========
-sudo dnf install gcc
-sudo dnf install G++
 
-sudo dnf install mesa-libGLU-devel
-sudo dnf install SDL2-devel
-
-Run a test build
+Run a test build (SLD2 window, not emscripten)
 ==========================
 mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
+#run the test
+./Debug/bin/MyApplication
+#you should see a blank window
 
-Install Magnum
-==============
-Magnum is required 
+Build for Emscripten
+====================
+#first do a manual build of corrade to generate corraderc executable
+cd ../corrade
+mkdir build && cd build
+cmake ..
+cmake --build .
+
+
+#build with emscripten
+mkdir build-emscripten && cd build-emscripten
+
