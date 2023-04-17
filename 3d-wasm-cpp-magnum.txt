@@ -114,7 +114,7 @@ nano index.html
       <div class="mn-status" id="status">Initialization...</div>
       <div class="mn-status-description" id="status-description"></div>
       <script src="EmscriptenApplication.js"></script>
-      <script async="async" src="MyAplication.js"></script>
+      <script async="async" src="MyApplication.js"></script>
     </div></div></div>
   </div>
 </body>
@@ -125,8 +125,83 @@ cp ../../../magnum/src/Magnum/Platform/EmscriptenApplication.js .
 
 python3 -m http.server
 
+#replace src/MyApplication.cpp with:
 
+START FILE
 
+#include <Magnum/GL/Buffer.h>
+#include <Magnum/GL/DefaultFramebuffer.h>
+#include <Magnum/GL/Mesh.h>
+#include <Magnum/Math/Color.h>
+#include <Magnum/Platform/Sdl2Application.h>
+#include <Magnum/Shaders/VertexColorGL.h>
 
+namespace Magnum { namespace Examples {
 
+class TriangleExample: public Platform::Application {
+    public:
+        explicit TriangleExample(const Arguments& arguments);
 
+    private:
+        void drawEvent() override;
+
+        GL::Mesh _mesh;
+        Shaders::VertexColorGL2D _shader;
+};
+
+TriangleExample::TriangleExample(const Arguments& arguments):Platform::Application{arguments, Configuration{}.setTitle("Magnum Triangle Example")}
+{
+    using namespace Math::Literals;
+
+    struct TriangleVertex {
+        Vector2 position;
+        Color3 color;
+    };
+    const TriangleVertex vertices[]{
+        {{-0.5f, -0.5f}, 0xff0000_rgbf},    /* Left vertex, red color */
+        {{ 1.0f, -1.0f}, 0x00ff00_rgbf},    /* Right vertex, green color */
+        {{ 0.0f,  0.5f}, 0x00ff00_rgbf},     /* Top vertex, blue color */
+		{{-1.0f, -1.0f}, 0xff0000_rgbf},    /* Left vertex, red color */
+        {{ 1.0f, -0.5f}, 0x00ff00_rgbf},    /* Right vertex, green color */
+        {{ 0.0f,  0.4f}, 0x0000ff_rgbf}     /* Top vertex, blue color */
+    };
+
+    _mesh
+		.setCount(Containers::arraySize(vertices))
+		.addVertexBuffer(GL::Buffer{vertices}, 0, Shaders::VertexColorGL2D::Position{}, Shaders::VertexColorGL2D::Color3{});
+}
+
+void TriangleExample::drawEvent() {
+    GL::defaultFramebuffer.clear(GL::FramebufferClear::Color);
+
+	_shader.draw(_mesh);
+	
+    swapBuffers();
+}
+
+}}
+
+MAGNUM_APPLICATION_MAIN(Magnum::Examples::TriangleExample)
+
+END FILE
+
+#edit src/CMakeLists.txt and add in Magnum::Shaders
+
+START FILE
+
+find_package(Magnum REQUIRED GL Sdl2Application)
+
+set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
+
+add_executable(MyApplication MyApplication.cpp)
+target_link_libraries(MyApplication PRIVATE
+    Magnum::Application
+    Magnum::GL
+    Magnum::Magnum
+    Magnum::Shaders
+)
+
+# Make the executable a default target to build & run in Visual Studio
+set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MyApplication)
+
+END FILE
