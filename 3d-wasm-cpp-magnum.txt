@@ -4,10 +4,12 @@ Steps required to render 3D in a web-browser using WASM and C++
 Create a base machine
 =====================
 - Install Virtualbox
-- Download Fedora ISO Image V37 worked
+- Download Fedora ISO Image (v37 worked)
+- Don't select the Image directly in virtualbox, mount the image as a CD image under 'storage' settings. Then remove after installation to HD.
 - Create a Fedora Virtual Machine using downloaded ISO (8GB RAM / 40GB HD)
+- Don't enable video acceleration.. Firefox crashed with this when viewing the generated WASM webpage
 
-Onen a console.  You should be in your home directory '~'
+Open a console.  You should be in your home directory '~'
 
 Install Emscripten
 ==================
@@ -31,6 +33,8 @@ git clone https://github.com/mosra/magnum.git
 
 Edit CMakeLists.txt and replace contents with:
 
+START FILE
+
 cmake_minimum_required(VERSION 3.4)
 project(MyApplication)
 
@@ -45,16 +49,16 @@ add_subdirectory(magnum EXCLUDE_FROM_ALL)
 
 add_subdirectory(src)
 
+END FILE
 
 
-
-Install CMake and other libs
-==========================
+Install CMake, compiler and other libs
+============================
 sudo dnf install cmake gcc g++ SDL2-devel
 
 
-Run a test build (SLD2 window, not emscripten)
-==========================
+Run a test Magnum build (SLD2 window, not emscripten)
+=====================================================
 mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
@@ -82,13 +86,15 @@ find -name "corrade-rc"
 # equating to ~/magnum-bootstrap-base/corrade/bin/corrade-rc
 # now build Corrade 'for' emscripten
 cd ~/magnum-bootstrap-base/corrade
-
+# now build corrade for emscripten
 mkdir build-emscripten && cd build-emscripten
 cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DEMSCRIPTEN_PREFIX=~/emsdk/upstream/emscripten  -DCMAKE_BUILD_TYPE=Release -DCORRADE_RC_EXECUTABLE=~/magnum-bootstrap-base/corrade/build/bin/corrade-rc
 cmake --build .
 
-cd ../..
-pwd #should be /home/ryan/magnum-bootstrap-base
+Build Magnum Example targetting WASM using Emscripten
+=====================================================
+cd ~/magnum-bootstrap-base
+pwd #should be ~/magnum-bootstrap-base
 mkdir build-emscripten && cd build-emscripten
 cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DCMAKE_BUILD_TYPE=Release -DCORRADE_RC_EXECUTABLE=~/magnum-bootstrap-base/corrade/build/bin/corrade-rc -DEMSCRIPTEN_PREFIX=~/emsdk/upstream/emscripten
 cmake --build .
@@ -120,12 +126,14 @@ nano index.html
 </body>
 </html>
 
+Copy supporting files to the ./Release/bin folder
 cp ../../../magnum/src/Magnum/Platform/WebApplication.css .
 cp ../../../magnum/src/Magnum/Platform/EmscriptenApplication.js .
 
 python3 -m http.server
+#open Firefox and navigate to http://localhost:8000
 
-#replace src/MyApplication.cpp with:
+#for an actual 3d example, replace src/MyApplication.cpp with:
 
 START FILE
 
@@ -214,7 +222,7 @@ cd ~/magnum-bootstrap-base/build-emscripten
 cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DCMAKE_BUILD_TYPE=Release -DCORRADE_RC_EXECUTABLE=~/magnum-bootstrap-base/corrade/build/bin/corrade-rc -DEMSCRIPTEN_PREFIX=~/emsdk/upstream/emscripten
 cmake --build .
 
-redo index.html etc again and statr pyhton webserver again
+restart python webserver again
 
 
 
