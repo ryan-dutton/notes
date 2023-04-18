@@ -4,9 +4,10 @@ Steps required to render 3D in a web-browser using WASM and C++
 Create a base machine
 =====================
 - Install Virtualbox
-- Download Fedora ISO Image V38?
-- Create a Fedora Virtual Machine using downloaded ISO (8GB RAM / 20GB HD)
+- Download Fedora ISO Image V37 worked
+- Create a Fedora Virtual Machine using downloaded ISO (8GB RAM / 40GB HD)
 
+Onen a console.  You should be in your home directory '~'
 
 Install Emscripten
 ==================
@@ -61,32 +62,37 @@ cmake --build .
 ./Debug/bin/MyApplication
 #you should see a blank window
 
+Get the toolchains for alternive builds (e.g. emscripten)
+=========================================================
+cd ~/magnum-bootstrap-base
+git clone https://github.com/mosra/toolchains.git
+cd corrade
+cp -R ../toolchains .
+#now have toolchains in both magnum-bootstrap-base and corrade
+
 Build Corrade for Emscripten
 ====================
 #first do a manual build of corrade to generate corrade-rc executable
-cd ../corrade
+cd ~/magnum-bootstrap-base/corrade
 mkdir build && cd build
 cmake .. -DCORRADE_BUILD_STATIC=On
 cmake --build .
 find -name "corrade-rc"
 # should be found at ./bin/corrade-rc
-# equating to /home/ryan/magnum-bootstrap-base/corrade/bin/corrade-rc
+# equating to ~/magnum-bootstrap-base/corrade/bin/corrade-rc
 # now build Corrade 'for' emscripten
-cd ../ #should be in ~/magnum-bootstrap-base/corrade
-cp -R ../toolchains .
+cd ~/magnum-bootstrap-base/corrade
+
 mkdir build-emscripten && cd build-emscripten
-cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DEMSCRIPTEN_PREFIX=/home/ryan/emsdk/upstream/emscripten  -DCMAKE_BUILD_TYPE=Release -DCCORRADE_RC_EXECUTABLE=/home/ryan/magnum-bootstrap-base/corrade/build/bin/corrade-rc
+cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DEMSCRIPTEN_PREFIX=~/emsdk/upstream/emscripten  -DCMAKE_BUILD_TYPE=Release -DCORRADE_RC_EXECUTABLE=~/magnum-bootstrap-base/corrade/build/bin/corrade-rc
 cmake --build .
 
 cd ../..
 pwd #should be /home/ryan/magnum-bootstrap-base
 mkdir build-emscripten && cd build-emscripten
-cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DCMAKE_BUILD_TYPE=Release -DCCORRADE_RC_EXECUTABLE=/home/ryan/magnum-bootstrap-base/corrade/build/bin/corrade-rc
+cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DCMAKE_BUILD_TYPE=Release -DCORRADE_RC_EXECUTABLE=~/magnum-bootstrap-base/corrade/build/bin/corrade-rc -DEMSCRIPTEN_PREFIX=~/emsdk/upstream/emscripten
 cmake --build .
 
-#build with emscripten
-cd ../../build-emscripten
-mkdir build-emscripten && cd build-emscripten
 #MyApplication.js and MyApplication.wasm should be in ./Release/bin
 cd ./Release/bin
 nano index.html
@@ -199,3 +205,16 @@ target_link_libraries(MyApplication PRIVATE
 set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MyApplication)
 
 END FILE
+
+
+#Edit src/CMakeLists.txt and add 'Magnum::Shaders' to target_link_libraries
+cd ~/magnum-bootstrap-base/build-emscripten
+
+#build again
+cmake .. -DCMAKE_TOOLCHAIN_FILE="../toolchains/generic/Emscripten-wasm.cmake" -DCMAKE_BUILD_TYPE=Release -DCORRADE_RC_EXECUTABLE=~/magnum-bootstrap-base/corrade/build/bin/corrade-rc -DEMSCRIPTEN_PREFIX=~/emsdk/upstream/emscripten
+cmake --build .
+
+redo index.html etc again and statr pyhton webserver again
+
+
+
